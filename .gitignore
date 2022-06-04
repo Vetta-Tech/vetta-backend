@@ -126,7 +126,7 @@ ipython_config.py
 __pypackages__/
 
 images
-
+/images
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
