@@ -21,6 +21,7 @@ class GenerateOTP(CreateAPIView):
             data=request.data,
             context={'request': request}
         )
+        print(request.data.get('phone_number'))
         if ser.is_valid():
             token = PhoneToken.create_otp_for_number(
                 request.data.get('phone_number')
@@ -32,7 +33,7 @@ class GenerateOTP(CreateAPIView):
                 return Response(phone_token.data)
             return Response({
                 'reason': "you can not have more than {n} attempts per day, please try again tomorrow".format(
-                    n=getattr(settings, 'PHONE_LOGIN_ATTEMPTS', 10))}, status=status.HTTP_403_FORBIDDEN)
+                    n=getattr(settings, 'PHONE_LOGIN_ATTEMPTS', 100))}, status=status.HTTP_403_FORBIDDEN)
         return Response(
             {'reason': ser.errors}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
@@ -51,6 +52,7 @@ class ValidateOTP(CreateAPIView):
             otp = request.data.get("otp")
             try:
                 user = authenticate(request, pk=pk, otp=otp)
+                print(user)
                 if user:
                     last_login = user.last_login
                 login(request, user)

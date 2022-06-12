@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, views, status
+from rest_framework import generics, views, status, permissions
 from rest_framework.response import Response
 
 from .serializers import (
@@ -21,6 +21,11 @@ from products.models import (
 class ProductListApiView(generics.ListAPIView):
     queryset = Products.objects.all()
     serializer_class = ProductsSerailizers
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def list(self, request):
+        print(self.request.user)
+        return None
 
 
 class ProductDetailsApiView(views.APIView):

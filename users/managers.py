@@ -1,5 +1,6 @@
+from tkinter.messagebox import NO
 from django.contrib.auth.base_user import BaseUserManager
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 
 class CustomUserManager(BaseUserManager):
@@ -8,18 +9,22 @@ class CustomUserManager(BaseUserManager):
     for authentication instead of usernames.
     """
 
-    def create_user(self, phone_number, password, **extra_fields):
+    def create_user(self, email, password, phone_number=None, **extra_fields):
         """
         Create and save a User with the given email and password.
         """
+
+        print(password)
         if not phone_number:
-            raise ValueError(_('The Email must be set'))
-        user = self.model(phone_number=phone_number, **extra_fields)
+            user = self.model(email=email, **extra_fields)
+        else:
+            user = self.model(phone_number=phone_number,
+                              email=email, **extra_fields)
         user.set_password(password)
         user.save()
         return user
 
-    def create_superuser(self, phone_number, password, **extra_fields):
+    def create_superuser(self, email, password, **extra_fields):
         """
         Create and save a SuperUser with the given email and password.
         """
@@ -31,4 +36,4 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_('Superuser must have is_staff=True.'))
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser=True.'))
-        return self.create_user(phone_number, password, **extra_fields)
+        return self.create_user(email, password, **extra_fields)

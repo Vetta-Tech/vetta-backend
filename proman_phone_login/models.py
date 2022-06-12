@@ -93,7 +93,7 @@ class PhoneToken(models.Model):
             datetime.date.today(), datetime.time.max)
         otps = cls.objects.filter(
             phone_number=number, timestamp__range=(today_min, today_max))
-        if otps.count() <= getattr(settings, 'PHONE_LOGIN_ATTEMPTS', 10):
+        if otps.count() <= getattr(settings, 'PHONE_LOGIN_ATTEMPTS', 100):
             otp = cls.generate_otp(length=getattr(
                 settings, 'PHONE_LOGIN_OTP_LENGTH', 4))
             phone_token = PhoneToken(phone_number=number, otp=otp)

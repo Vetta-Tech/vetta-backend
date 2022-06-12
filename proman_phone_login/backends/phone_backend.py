@@ -1,5 +1,7 @@
 import datetime
 import uuid
+import random
+import string
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -9,6 +11,10 @@ from ..models import PhoneToken
 from ..utils import model_field_attr
 
 
+def random_char(y):
+    return ''.join(random.choice(string.ascii_letters) for x in range(y))
+
+
 class PhoneBackend(ModelBackend):
     def __init__(self, *args, **kwargs):
         self.user_model = get_user_model()
@@ -16,18 +22,21 @@ class PhoneBackend(ModelBackend):
     def get_username(self):
         """
         Returns a UUID-based 'random' and unique username.
-
         This is required data for user models with a username field.
         """
-        return str(uuid.uuid4())[:model_field_attr(
+        username = str(uuid.uuid4())[:model_field_attr(
             self.user_model, 'username', 'max_length')
-               ]
+        ]
+        print('username', username)
+        return username
 
     def create_user(self, phone_token, **extra_fields):
         """
         Create and returns the user based on the phone_token.
         """
         password = self.user_model.objects.make_random_password()
+        email = (random_char(7)+"@gmail.com")
+        print(email)
         if extra_fields.get('username'):
             username = extra_fields.get('username')
         else:
@@ -38,6 +47,7 @@ class PhoneBackend(ModelBackend):
             password = password
         phone_number = phone_token.phone_number
         user = self.user_model.objects.create_user(
+            email=email,
             username=username,
             password=password,
             phone_number=phone_number
@@ -52,7 +62,6 @@ class PhoneBackend(ModelBackend):
             minutes=getattr(settings, 'PHONE_LOGIN_MINUTES', 10)
         )
         try:
-
             phone_token = PhoneToken.objects.get(
                 pk=pk,
                 otp=otp,
@@ -69,9 +78,13 @@ class PhoneBackend(ModelBackend):
         user = self.user_model.objects.filter(
             phone_number=phone_token.phone_number
         ).first()
+        email = (random_char(7)+"@gmail.com")
+        print(email)
+
         if not user:
             user = self.create_user(
                 phone_token=phone_token,
+                email=email,
                 **extra_fields
             )
         phone_token.used = True

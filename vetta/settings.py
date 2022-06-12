@@ -6,7 +6,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 DEBUG = str(os.environ.get('DEBUG')) == "1"  # 1 == True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 SYSTEM_APPS = [
     'django.contrib.admin',
@@ -21,7 +21,15 @@ THIRT_PARTY_APPS = [
     "taggit",
     "rest_framework",
     "proman_phone_login",
-    "rest_framework.authtoken"
+    "rest_framework.authtoken",
+    'django.contrib.sites',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.google',
+    'rest_auth'
 ]
 LOCAL_APPS = [
     "products",
@@ -29,7 +37,7 @@ LOCAL_APPS = [
     "userprofile",
     "cart"
 ]
-
+SITE_ID = 1
 
 INSTALLED_APPS = SYSTEM_APPS + THIRT_PARTY_APPS + LOCAL_APPS
 
@@ -98,9 +106,14 @@ REST_FRAMEWORK = {
     )
 }
 
+REST_AUTH_SERIALIZERS = {
+    'TOKEN_SERIALIZER': 'users.api.serializers.RestAuthCustomSerializers',
+}
+
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'proman_phone_login.backends.phone_backend.PhoneBackend',
+
 )
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -134,6 +147,7 @@ STATIC_URL = '/static/'
 
 INTERNAL_IPS = [
     "127.0.0.1",
+    '192.168.0.204'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -143,3 +157,18 @@ TAGGIT_CASE_INSENSITIVE = True
 DEFAULTS = {
     'PASSWORDLESS_TOKEN_EXPIRE_TIME': 15
 }
+
+
+# SOCIAL_AUTH_FACEBOOK_KEY = '390102736420240'
+# SOCIAL_AUTH_FACEBOOK_SECRET = 'cad3e0683503dedf7f0c5791e9712ed5'
+# SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', ]  # optional
+# SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {'locale': 'ru_RU'}
+
+# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = (
+#     '839900927386-1bj6d42it1qve2ahucpii22kep0v4rur.apps.googleusercontent.com'
+# )
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', ]
+
+
+# #

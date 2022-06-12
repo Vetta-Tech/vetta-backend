@@ -6,6 +6,10 @@ from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from taggit.managers import TaggableManager
 
+from django.contrib.auth import settings
+
+User = settings.AUTH_USER_MODEL
+
 STATUS = (
     ('TRUE', 'TRUE'),
     ('FALSE', 'FALSE'),
