@@ -159,16 +159,9 @@ DEFAULTS = {
 }
 
 
-# SOCIAL_AUTH_FACEBOOK_KEY = '390102736420240'
-# SOCIAL_AUTH_FACEBOOK_SECRET = 'cad3e0683503dedf7f0c5791e9712ed5'
-# SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', ]  # optional
-# SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {'locale': 'ru_RU'}
-
-# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = (
-#     '839900927386-1bj6d42it1qve2ahucpii22kep0v4rur.apps.googleusercontent.com'
-# )
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', ]
-
-
-# #
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8081",
+    "http://127.0.0.1:8081"
+]

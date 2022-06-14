@@ -103,9 +103,9 @@ class PhoneToken(models.Model):
             data = {'token': token,
                     "otp": otp, 'to': number, "id": phone_token.id, 'message': message
                     }
-            responses = requests.post(url=greenweburl, data=data)
-            response = responses.text
-            print('response', response)
+            # responses = requests.post(url=greenweburl, data=data)
+            # response = responses.text
+            print('response successfully', otp)
             return phone_token
         else:
             return False

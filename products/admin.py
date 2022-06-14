@@ -7,6 +7,7 @@ from .models import (
     Color,
     Size,
     Variants,
+    SubCategory
 )
 
 
@@ -31,3 +32,4 @@ admin.site.register(Variants)
 admin.site.register(ProductImages)
 admin.site.register(Color)
 admin.site.register(Size)
+admin.site.register(SubCategory)

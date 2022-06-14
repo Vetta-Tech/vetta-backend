@@ -41,6 +41,26 @@ class Category(models.Model):
         return self.name
 
 
+class SubCategory(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(blank=True, null=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, blank=True, null=True)
+    keywords = TaggableManager()
+    description = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='image/subcategory', blank=True)
+    status = models.CharField(max_length=10, choices=STATUS)
+    created_at = models.DateTimeField(default=timezone.now())
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+        verbose_name_plural = 'Subcategory'
+
+    def __str__(self):
+        return self.name
+
+
 class Products(models.Model):
     name = models.CharField(
         max_length=100,
@@ -62,6 +82,8 @@ class Products(models.Model):
         help_text='Do not put anything in this field'
     )
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    sub_category = models.ForeignKey(
+        SubCategory, on_delete=models.CASCADE, blank=True, null=True)
     short_description = models.CharField(
         max_length=80,
         help_text='A short description for the product within 80 words'
@@ -94,6 +116,8 @@ class Products(models.Model):
         choices=STATUS,
         default='TRUE'
     )
+    is_featured = models.BooleanField(default=False)
+    is_popular = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now())
     updated_at = models.DateTimeField(auto_now=True)
 

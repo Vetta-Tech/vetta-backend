@@ -12,8 +12,10 @@ from products.models import (
     Products,
     ProductImages,
     Color,
+    SubCategory,
     Size,
     Variants,
+
 )
 
 
@@ -24,6 +26,25 @@ class CategoriesSerailizers(serializers.ModelSerializer, TaggitSerializer):
         model = Category
         fields = (
             '__all__'
+        )
+
+
+class SaubCategorySerailizers(serializers.ModelSerializer, TaggitSerializer):
+    keywords = TagListSerializerField()
+    category = CategoriesSerailizers(many=False)
+
+    class Meta:
+        model = SubCategory
+        fields = (
+            'name',
+            'slug',
+            'keywords',
+            'description',
+            'category',
+            'image',
+            'status',
+            'created_at',
+            'updated_at',
         )
 
 
@@ -68,11 +89,27 @@ class VariantsSerailizers(serializers.ModelSerializer):
         )
 
 
+class ProductSerializerMinimal(serializers.ModelSerializer, TaggitSerializer):
+    class Meta:
+        model = Products
+        fields = (
+            'supplier_name',
+            'name',
+            'slug',
+            'category',
+            'thumbnail',
+            'price',
+            'status',
+            'is_featured'
+        )
+
+
 class ProductsSerailizers(serializers.ModelSerializer, TaggitSerializer):
     category = CategoriesSerailizers(many=False)
-    images = ProductImagesSerailizers(many=True, read_only=True)
+    sub_category = SaubCategorySerailizers(many=False)
     variants = VariantsSerailizers(many=True, read_only=True)
     keywords = TagListSerializerField()
+    images = ProductImagesSerailizers(many=True, read_only=True)
 
     class Meta:
         model = Products
@@ -81,6 +118,7 @@ class ProductsSerailizers(serializers.ModelSerializer, TaggitSerializer):
             'name',
             'slug',
             'category',
+            'sub_category',
             'short_description',
             'description',
             'keywords',
