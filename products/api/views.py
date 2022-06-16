@@ -1,11 +1,12 @@
-from nis import cat
 import re
+from unicodedata import category
 from webbrowser import get
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, views, status, permissions
 from rest_framework.response import Response
 
 from .serializers import (
+    CategoriesSerailizers,
     ProductSerializerMinimal,
     SaubCategorySerailizers,
     VariantsSerailizers,
@@ -88,17 +89,13 @@ class HomeProductsApiView(views.APIView):
         }, status=status.HTTP_200_OK)
 
 
-class FetchProductsByCategory(views.APIView):
+class FetchProductsByCategory1(views.APIView):
     def get(self, request, *args, **kwargs):
         category = request.query_params.get('cat')
         sub_category = request.query_params.get('sub_cat')
         category_qs = SubCategory.objects.filter(
             category__name__iexact=category
         )
-
-        print('asdasd', category)
-
-        print(category)
 
         category_qs_serialize = SaubCategorySerailizers(category_qs, many=True)
         if sub_category == 'All Products':
@@ -116,7 +113,6 @@ class FetchProductsByCategory(views.APIView):
                 category__name__icontains=category,
                 sub_category__name__icontains=sub_category,
             )
-            print('qs both', qs)
             serialize = ProductsSerailizers(qs, many=True)
             return Response({
                 "products": serialize.data,
@@ -126,10 +122,120 @@ class FetchProductsByCategory(views.APIView):
             qs = Products.objects.filter(
                 category__name__icontains=category,
             )
-            print('qs one', qs)
 
             serialize = ProductsSerailizers(qs, many=True)
             return Response({
                 "products": serialize.data,
                 "category_qs": category_qs_serialize.data
             }, status=status.HTTP_200_OK)
+
+
+class GetProductsByBrands(views.APIView):
+    def get(self, request, *args, **kwargs):
+        brand_name = request.query_params.get('brands_name')
+
+        if brand_name is None:
+            return Response({"err": "brand_name is not provide"}, status=status.HTTP_400_BAD_REQUEST)
+        product_qs = Products.objects.filter(
+            supplier_name=brand_name
+        )
+
+        print('brand_name', product_qs)
+
+        serailizer = ProductsSerailizers(product_qs, many=True)
+        return Response({"products": serailizer.data}, status=status.HTTP_200_OK)
+
+
+class GetAllCategories(views.APIView):
+    def get(self, request, *args, **kwargs):
+        category_qs = Category.objects.all().order_by('-created_at')
+        serializer = CategoriesSerailizers(category_qs, many=True)
+        return Response({
+            "categories": serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+def is_there_more(qs, offset):
+    if int(offset) > qs.count():
+        return False
+    return True
+
+
+def infinit_scroll(request):
+    limit = request.GET.get('limit')
+    offset = request.GET.get('offset')
+    return Products.objects.filter(is_featured=True)[int(offset): int(offset) + int(limit)]
+
+
+class GetFeaturedProducts(generics.ListAPIView):
+    serializer_class = ProductsSerailizers
+
+    def get_queryset(self):
+        qs = infinit_scroll(self.request)
+        return qs
+
+    def list(self, request, *args, **kwargs):
+        cat_qs = Category.objects.all().order_by('-created_at')
+        cat_serializers = CategoriesSerailizers(cat_qs, many=True)
+        p_qs = Products.objects.filter(
+            is_featured=True).order_by('-created_at')
+        serializer = ProductsSerailizers(p_qs, many=True)
+        qs = self.get_queryset()
+        serializer = ProductsSerailizers(qs, many=True)
+        return Response({
+            "featured": serializer.data,
+            "featured": serializer.data,
+            "cat_qs": cat_serializers.data,
+            "hasMore": is_there_more(qs, request.GET.get('offset'))
+        })
+
+
+def infinite_scroll_category(request):
+    limit = request.GET.get('limit')
+    offset = request.GET.get('offset')
+    print(limit, offset)
+    category = request.query_params.get('cat')
+    sub_category = request.query_params.get('sub_cat')
+    print(category, sub_category)
+
+    if sub_category == 'All Products':
+        qs = Products.objects.filter(
+            category__name__icontains=category,
+        )
+        return qs[int(offset): int(offset) + int(limit)]
+    if category and sub_category is not None:
+        qs = Products.objects.filter(
+            category__name__icontains=category,
+            sub_category__name__icontains=sub_category,
+        )
+        return qs[int(offset): int(offset) + int(limit)]
+    elif category is not None:
+        qs = Products.objects.filter(
+            category__name__icontains=category,
+        )
+        return qs[int(offset): int(offset) + int(limit)]
+
+
+class FetchProductsByCategory(generics.ListAPIView):
+    serializer_class = ProductsSerailizers
+
+    def get_queryset(self):
+        qs = infinite_scroll_category(self.request)
+        category = self.request.query_params.get('cat')
+        category_qs = SubCategory.objects.filter(
+            category__name__iexact=category
+        )
+
+        print('qs', qs, category_qs)
+
+        return qs, category_qs
+
+    def list(self, request, *args, **kwargs):
+        qs, category_qs = self.get_queryset()
+        serialize = ProductsSerailizers(qs, many=True)
+        category_qs_serialize = SaubCategorySerailizers(category_qs, many=True)
+
+        return Response({
+            "products": serialize.data,
+            "category_qs": category_qs_serialize.data
+        }, status=status.HTTP_200_OK)

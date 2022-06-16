@@ -114,6 +114,7 @@ class ProductsSerailizers(serializers.ModelSerializer, TaggitSerializer):
     class Meta:
         model = Products
         fields = (
+            'id',
             'supplier_name',
             'name',
             'slug',
