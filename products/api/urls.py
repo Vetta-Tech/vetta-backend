@@ -7,7 +7,8 @@ from .views import (
     FetchProductsByCategory,
     GetProductsByBrands,
     GetAllCategories,
-    GetFeaturedProducts
+    GetFeaturedProducts,
+    GetPopularProducts
 )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path('brands', GetProductsByBrands.as_view()),
     path('categories', GetAllCategories.as_view()),
     path('featured-infinite', GetFeaturedProducts.as_view()),
+    path('popular-infinite', GetPopularProducts.as_view()),
 ]

@@ -19,6 +19,7 @@ urlpatterns = [
     path('api/login/', include('rest_social_auth.urls_token')),
 
     path('api/v1/auth/', include('proman_phone_login.urls')),
+    path('api/v1/supplier/', include('supplier.api.urls')),
     path('api/v1/products/', include('products.api.urls'))
 ]
 

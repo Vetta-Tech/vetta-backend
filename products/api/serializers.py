@@ -7,45 +7,19 @@ from taggit.serializers import (
     TaggitSerializer
 )
 
+from category.api.serializers import (
+    CategoriesSerailizers,
+    SaubCategorySerailizers
+)
+
 from products.models import (
-    Category,
     Products,
     ProductImages,
     Color,
-    SubCategory,
     Size,
     Variants,
 
 )
-
-
-class CategoriesSerailizers(serializers.ModelSerializer, TaggitSerializer):
-    keywords = TagListSerializerField()
-
-    class Meta:
-        model = Category
-        fields = (
-            '__all__'
-        )
-
-
-class SaubCategorySerailizers(serializers.ModelSerializer, TaggitSerializer):
-    keywords = TagListSerializerField()
-    category = CategoriesSerailizers(many=False)
-
-    class Meta:
-        model = SubCategory
-        fields = (
-            'name',
-            'slug',
-            'keywords',
-            'description',
-            'category',
-            'image',
-            'status',
-            'created_at',
-            'updated_at',
-        )
 
 
 class ProductImagesSerailizers(serializers.ModelSerializer):

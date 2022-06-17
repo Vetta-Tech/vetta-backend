@@ -8,6 +8,10 @@ from taggit.managers import TaggableManager
 
 from django.contrib.auth import settings
 
+from category.models import Category, SubCategory
+
+from supplier.models import Supplier
+
 User = settings.AUTH_USER_MODEL
 
 STATUS = (
@@ -21,44 +25,6 @@ PRODUCT_DISPLAY_VARIANT = (
     ('Color', 'Color'),
     ('Size-Color', 'Size-Color'),
 )
-
-
-class Category(models.Model):
-    name = models.CharField(max_length=50)
-    slug = models.SlugField(blank=True, null=True)
-    keywords = TaggableManager()
-    description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='images/category', blank=True)
-    status = models.CharField(max_length=10, choices=STATUS)
-    created_at = models.DateTimeField(default=timezone.now())
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ('-created_at',)
-        verbose_name_plural = 'Categories'
-
-    def __str__(self):
-        return self.name
-
-
-class SubCategory(models.Model):
-    name = models.CharField(max_length=50)
-    slug = models.SlugField(blank=True, null=True)
-    category = models.ForeignKey(
-        Category, on_delete=models.CASCADE, blank=True, null=True)
-    keywords = TaggableManager()
-    description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='image/subcategory', blank=True)
-    status = models.CharField(max_length=10, choices=STATUS)
-    created_at = models.DateTimeField(default=timezone.now())
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ('-created_at',)
-        verbose_name_plural = 'Subcategory'
-
-    def __str__(self):
-        return self.name
 
 
 class Products(models.Model):
@@ -77,6 +43,8 @@ class Products(models.Model):
         null=True,
         help_text='Supplier Profile'
     )
+    supplier = models.ForeignKey(
+        Supplier, on_delete=models.CASCADE, blank=True, null=True)
     slug = models.SlugField(
         blank=True, null=True,
         help_text='Do not put anything in this field'

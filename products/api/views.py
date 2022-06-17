@@ -14,10 +14,14 @@ from .serializers import (
     ProductsSerailizers,
 )
 
-from products.models import (
+from category.models import (
     Category,
-    Products,
     SubCategory,
+)
+
+from products.models import (
+
+    Products,
     ProductImages,
     Color,
     Size,
@@ -196,12 +200,13 @@ def infinite_scroll_category(request):
     print(limit, offset)
     category = request.query_params.get('cat')
     sub_category = request.query_params.get('sub_cat')
-    print(category, sub_category)
+    print('sub_category', sub_category)
 
     if sub_category == 'All Products':
         qs = Products.objects.filter(
             category__name__icontains=category,
         )
+        print('qs', qs)
         return qs[int(offset): int(offset) + int(limit)]
     if category and sub_category is not None:
         qs = Products.objects.filter(
@@ -226,12 +231,11 @@ class FetchProductsByCategory(generics.ListAPIView):
             category__name__iexact=category
         )
 
-        print('qs', qs, category_qs)
-
         return qs, category_qs
 
     def list(self, request, *args, **kwargs):
         qs, category_qs = self.get_queryset()
+        print(qs, category_qs)
         serialize = ProductsSerailizers(qs, many=True)
         category_qs_serialize = SaubCategorySerailizers(category_qs, many=True)
 
@@ -239,3 +243,33 @@ class FetchProductsByCategory(generics.ListAPIView):
             "products": serialize.data,
             "category_qs": category_qs_serialize.data
         }, status=status.HTTP_200_OK)
+
+
+def infinit_scroll_popular(request):
+    limit = request.GET.get('limit')
+    offset = request.GET.get('offset')
+    return Products.objects.filter(is_featured=True)[int(offset): int(offset) + int(limit)]
+
+
+class GetPopularProducts(generics.ListAPIView):
+    serializer_class = ProductsSerailizers
+
+    def get_queryset(self):
+        qs = infinit_scroll_popular(self.request)
+        category_qs = Category.objects.all()
+        print(qs)
+        return qs, category_qs
+
+    def list(self, request, *args, **kwargs):
+        cat_qs = Category.objects.all().order_by('-created_at')
+        cat_serializers = CategoriesSerailizers(cat_qs, many=True)
+        p_qs = Products.objects.filter(
+            is_popular=True).order_by('-created_at')
+        serializer = ProductsSerailizers(p_qs, many=True)
+        qs = self.get_queryset()
+        serializer = ProductsSerailizers(qs, many=True)
+        return Response({
+            "popular": serializer.data,
+            "cat_qs": cat_serializers.data,
+            "hasMore": is_there_more(qs, request.GET.get('offset'))
+        })
