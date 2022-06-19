@@ -197,7 +197,6 @@ class GetFeaturedProducts(generics.ListAPIView):
 def infinite_scroll_category(request):
     limit = request.GET.get('limit')
     offset = request.GET.get('offset')
-    print(limit, offset)
     category = request.query_params.get('cat')
     sub_category = request.query_params.get('sub_cat')
     print('sub_category', sub_category)
