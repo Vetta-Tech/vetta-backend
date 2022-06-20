@@ -1,3 +1,4 @@
+import re
 from rest_framework import generics, status
 from rest_framework.response import Response
 from products.models import Products
@@ -23,8 +24,6 @@ def infinite_scroll_brands(request):
     offset = request.GET.get('offset')
     cat = request.GET.get('cat')
     supplier = request.GET.get('supplier')
-
-    print(cat, supplier, limit, offset)
 
     if cat == 'All Products':
         qs = Products.objects.filter(
@@ -57,4 +56,38 @@ class SupplierProductsByCategory(generics.ListAPIView):
         serializer = ProductsSerailizers(qs, many=True)
         return Response({
             "products": serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+def infinite_scroll_category(request):
+    limit = request.GET.get('limit')
+    offset = request.GET.get('offset')
+    cat = request.GET.get('cat')
+    print(limit, offset, cat)
+
+    if cat == 'All Brands':
+        qs = Supplier.objects.all()
+        print('All Products', qs)
+
+        return qs[int(offset): int(offset) + int(limit)]
+    else:
+        qs = Supplier.objects.filter(
+            category__name=cat
+        )
+        print('All Products--2', qs)
+
+        return qs[int(offset): int(offset) + int(limit)]
+
+
+class SupplierByCategory(generics.ListAPIView):
+    def get_queryset(self):
+        qs = infinite_scroll_category(self.request)
+        return qs
+
+    def list(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        print('supplier list', qs)
+        serializer = SupplierSerializers(qs, many=True)
+        return Response({
+            "brands": serializer.data
         }, status=status.HTTP_200_OK)

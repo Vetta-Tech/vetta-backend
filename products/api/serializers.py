@@ -48,16 +48,14 @@ class SizeSerailizers(serializers.ModelSerializer):
 
 class VariantsSerailizers(serializers.ModelSerializer):
     size = SizeSerailizers(many=False)
-    color = ColorSerailizers(many=False)
 
     class Meta:
         model = Variants
         fields = (
+            'id',
             'title',
             'product',
-            'color',
             'size',
-            'image_id',
             'quantity',
             'price',
         )

@@ -147,6 +147,7 @@ class Size(models.Model):
         max_length=10,
         help_text='This will be the size code of this product'
     )
+    default = models.BooleanField(default=False)
 
     def __str__(self):
         return self.code
@@ -162,19 +163,12 @@ class Variants(models.Model):
         Products,
         on_delete=models.CASCADE
     )
-    color = models.ForeignKey(
-        Color,
-        on_delete=models.CASCADE
-    )
+
     size = models.ForeignKey(
         Size,
         on_delete=models.CASCADE
     )
-    image_id = models.CharField(
-        max_length=5,
-        blank=True,
-        null=True,
-    )
+
     quantity = models.PositiveIntegerField(default=1)
     price = models.PositiveIntegerField(
         default=10,
@@ -186,4 +180,4 @@ class Variants(models.Model):
     )
 
     def __str__(self) -> str:
-        return self.product.name
+        return self.title
