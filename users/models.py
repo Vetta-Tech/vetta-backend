@@ -14,6 +14,8 @@ class User(AbstractUser):
         blank=True, null=True, help_text='Contact phone number', unique=True
     )
     email = models.EmailField(blank=True, unique=True)
+    is_phone_verified = models.BooleanField(
+        default=False, blank=True, null=True)
 
     username = models.CharField(max_length=40, default='sohan')
     USERNAME_FIELD = 'email'

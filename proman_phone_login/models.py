@@ -21,7 +21,7 @@ token = "78357850c4b1950fb49d91adca2e4318"
 class PhoneNumberUserManager(BaseUserManager):
     use_in_migrations = True
 
-    def _create_user(self, username, phone_number, email,
+    def _create_user(self, username, phone_number, is_phone_verified, email,
                      password, **extra_fields):
         """
         Creates and saves a User with the given username, email and password.
@@ -31,18 +31,18 @@ class PhoneNumberUserManager(BaseUserManager):
         email = self.normalize_email(email)
         username = self.model.normalize_username(username)
         user = self.model(
-            username=username, email=email, phone_number=phone_number,
+            username=username, email=email, is_phone_verified=is_phone_verified, phone_number=phone_number,
             **extra_fields
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, username, phone_number,
+    def create_user(self, username, phone_number, is_phone_verified,
                     email=None, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
-        return self._create_user(username, phone_number, email, password,
+        return self._create_user(username, phone_number, is_phone_verified, email, password,
                                  **extra_fields)
 
     def create_superuser(self, username, phone_number, email, password,

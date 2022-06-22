@@ -36,7 +36,6 @@ class PhoneBackend(ModelBackend):
         """
         password = self.user_model.objects.make_random_password()
         email = (random_char(7)+"@gmail.com")
-        print(email)
         if extra_fields.get('username'):
             username = extra_fields.get('username')
         else:
@@ -50,7 +49,8 @@ class PhoneBackend(ModelBackend):
             email=email,
             username=username,
             password=password,
-            phone_number=phone_number
+            phone_number=phone_number,
+            is_phone_verified=True
         )
         return user
 
@@ -78,7 +78,7 @@ class PhoneBackend(ModelBackend):
         user = self.user_model.objects.filter(
             phone_number=phone_token.phone_number
         ).first()
-        email = (random_char(7)+"@gmail.com")
+        email = (random_char(7)+"@vetta.app")
         print(email)
 
         if not user:

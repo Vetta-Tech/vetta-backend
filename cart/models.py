@@ -1,9 +1,10 @@
 from django.db import models
 from django.conf import settings
+from django.db.models.signals import pre_save, pre_delete
 from django.utils import timezone
 
-from products.models import Products, Variants
-from products.models import Size
+from products.models import Products, Variants, Size
+from coupon.models import Coupon
 
 User = settings.AUTH_USER_MODEL
 
@@ -27,7 +28,11 @@ class FinalCart(models.Model):
     expires = models.BooleanField(default=False)
     coupon = models.CharField(max_length=40, blank=True, null=True)
     sub_total = models.PositiveIntegerField(default=1)
-
+    total = models.PositiveBigIntegerField(default=1)
+    coupon = models.ForeignKey(
+        Coupon, on_delete=models.CASCADE, blank=True, null=True
+    )
+    total_saved = models.PositiveBigIntegerField(default=0)
     expires = models.BooleanField(blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now())
     ordered_date = models.DateTimeField()

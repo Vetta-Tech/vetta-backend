@@ -21,6 +21,7 @@ class CartSerializer(serializers.ModelSerializer):
         )
 
     def get_product(self, obj):
+        print('obj pr', obj.product)
         return ProductsSerailizers(obj.product).data
 
     def get_variant(self, obj):

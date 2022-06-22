@@ -37,7 +37,8 @@ LOCAL_APPS = [
     "userprofile",
     "cart",
     "supplier",
-    "category"
+    "category",
+    "coupon"
 ]
 SITE_ID = 1
 
