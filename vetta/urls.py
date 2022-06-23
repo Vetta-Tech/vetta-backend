@@ -18,6 +18,8 @@ urlpatterns = [
     path('api/v1/rest-auth/google/', GoogleLogin.as_view(), name='google_login'),
     path('api/login/', include('rest_social_auth.urls_token')),
 
+    path('api/v1/user/', include('users.api.urls')),
+
     path('api/v1/auth/', include('proman_phone_login.urls')),
     path('api/v1/supplier/', include('supplier.api.urls')),
     path('api/v1/products/', include('products.api.urls')),
