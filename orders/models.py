@@ -42,7 +42,7 @@ class Order(models.Model):
     order_total = models.PositiveIntegerField(default=1)
 
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
-    payment_method = models.CharField(max_length=20)
+    payment_method = models.CharField(max_length=20, blank=True, null=True)
 
     order_status = models.CharField(
         max_length=64, blank=True, null=True, choices=ORDER_STATUS)

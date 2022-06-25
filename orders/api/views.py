@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from sslcommerz_lib import SSLCOMMERZ
 
 from address.models import Address
-from cart.models import FinalCart
+from cart.models import Cart, FinalCart
 from orders.models import Order
 from .serializers import OrderSerializer
 
@@ -60,17 +60,17 @@ class SslCommerzTest(views.APIView):
         order_total = order_qs.order_total
         print(order_total)
 
-        settings = {'store_id': 'proma6135dc6bc8c18',
-                    'store_pass': 'proma6135dc6bc8c18@ssl', 'issandbox': True}
+        settings = {'store_id': 'cosme5ff2ce80343e6',
+                    'store_pass': 'cosme5ff2ce80343e6@ssl', 'issandbox': True}
         sslcz = SSLCOMMERZ(settings)
         post_body = {}
         # post_body['user'] = user
         post_body['total_amount'] = order_total
         post_body['currency'] = "BDT"
         post_body['tran_id'] = 'asd'
-        post_body['success_url'] = 'https://proman.clothing/user/success'
-        post_body['fail_url'] = 'https://proman.clothing/user/failure'
-        post_body['cancel_url'] = 'https://proman.clothing/user/cancel'
+        post_body['success_url'] = 'https://www.youtube.com/'
+        post_body['fail_url'] = 'https://m.facebook.com/'
+        post_body['cancel_url'] = 'http://192.168.0.204:8000/api/v1/orders/test'
         post_body['emi_option'] = 0
         post_body['cus_name'] = 'sohan'
         post_body['cus_email'] = 'email@rmail.com'
@@ -89,3 +89,35 @@ class SslCommerzTest(views.APIView):
         response = sslcz.createSession(post_body)
         print(response)
         return Response(response)
+
+
+class OrdercofirmApiView(views.APIView):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        payment_method = request.data.get('payment_method', None)
+        cart_qs = Cart.objects.filter(user=request.user, expires=False)
+        for q in cart_qs:
+            q.expires = True
+            q.save()
+        final_cart_qs = FinalCart.objects.filter(
+            user=request.user, expires=False).first()
+        if final_cart_qs:
+            order_qs = Order.objects.filter(user=user, orordered=False).first()
+            if final_cart_qs:
+                final_cart_qs.expires = True
+                final_cart_qs.save()
+
+            order_qs.orordered = True
+            order_qs.payment_method = payment_method
+            order_qs.save()
+
+            print(order_qs)
+            serializer = OrderSerializer(order_qs)
+            return Response({'order_qs': serializer.data}, status=status.HTTP_200_OK)
+        return Response({'msg': "No active cart found"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CreateTest(generics.ListCreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
