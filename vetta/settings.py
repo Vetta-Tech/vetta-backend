@@ -164,6 +164,8 @@ DEFAULTS = {
 }
 
 
+BARIKOI_API = "MzQ3MjpKM0JHWkI4WDc1"
+
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
