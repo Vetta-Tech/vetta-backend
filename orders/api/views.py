@@ -104,18 +104,21 @@ class OrdercofirmApiView(views.APIView):
             user=request.user, expires=False).first()
         if final_cart_qs:
             order_qs = Order.objects.filter(user=user, orordered=False).first()
-            if final_cart_qs:
+            if order_qs:
+                print('order_qs', order_qs)
                 final_cart_qs.expires = True
                 final_cart_qs.save()
 
-            order_qs.orordered = True
-            order_qs.payment_method = payment_method
-            order_qs.save()
+                order_qs.orordered = True
+                order_qs.payment_method = payment_method
+                order_qs.save()
 
-            print(order_qs)
-            serializer = OrderSerializer(order_qs)
-            return Response({'order_qs': serializer.data}, status=status.HTTP_200_OK)
-        return Response({'msg': "No active cart found"}, status=status.HTTP_400_BAD_REQUEST)
+                print(order_qs)
+                serializer = OrderSerializer(order_qs)
+                return Response({'order_qs': serializer.data}, status=status.HTTP_200_OK)
+            return Response({'msg': "No active order found"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'msg': "No active cart found"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CreateTest(generics.ListCreateAPIView):

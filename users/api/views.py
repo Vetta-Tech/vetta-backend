@@ -88,6 +88,8 @@ class ValidateOtp(generics.CreateAPIView):
                 timestamp__gte=timestamp_difference
             )
             if phone_token:
+                phone_token.used = True
+                phone_token.save()
                 user = request.user
                 user.is_phone_verified = True
                 user.phone_number = '+880'+phone_number

@@ -25,11 +25,15 @@ class UserCartListApiView(views.APIView):
                 return Response({
                     "cart_qs": serailizer.data,
                     "final_cart": final_qs_serializer.data,
-                })
+                }, status=status.HTTP_200_OK)
             else:
-                return None
+                return Response({
+                    "msg": "No cart"
+                }, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return None
+            return Response({
+                "msg": "No cart"
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AddToCart(views.APIView):
