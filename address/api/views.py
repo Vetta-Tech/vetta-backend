@@ -7,14 +7,17 @@ from .serializers import AddressSerializers
 class GetUserAddress(views.APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
-        address_qs = Address.objects.filter(user=user).first()
-        print(address_qs)
-
-        if address_qs:
-            serializer = AddressSerializers(address_qs)
-            return response.Response({'user_address': serializer.data, 'user_have_address': True})
+        if user.is_authenticated:
+            address_qs = Address.objects.filter(user=user).first()
+            if address_qs:
+                serializer = AddressSerializers(address_qs)
+                return response.Response({'user_address': serializer.data, 'user_have_address': True})
+            else:
+                return response.Response({'user_have_address': False})
         else:
-            return response.Response({'user_have_address': False})
+            return response.Response({
+                "msg": "auth error"
+            }, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class CreateAddressApiView(generics.ListCreateAPIView):
@@ -73,4 +76,5 @@ class SaveLocalCoordsToDB(views.APIView):
                 )
                 return response.Response(status=status.HTTP_200_OK)
         else:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+            print('errrrrrrrrrrrrrrrrrr')
+            return response.Response({"msg": "User Unauthorized"}, status=status.HTTP_400_BAD_REQUEST)
