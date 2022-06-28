@@ -8,7 +8,8 @@ class GetUserAddress(views.APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         if user.is_authenticated:
-            address_qs = Address.objects.filter(user=user).first()
+            address_qs = Address.objects.filter(user=user).last()
+            print('address_qs.....................', address_qs)
             if address_qs:
                 serializer = AddressSerializers(address_qs)
                 return response.Response({'user_address': serializer.data, 'user_have_address': True})
@@ -16,7 +17,8 @@ class GetUserAddress(views.APIView):
                 return response.Response({'user_have_address': False})
         else:
             return response.Response({
-                "msg": "auth error"
+                "msg": "auth error",
+                "user_have_address": False
             }, status=status.HTTP_401_UNAUTHORIZED)
 
 
@@ -26,7 +28,7 @@ class CreateAddressApiView(generics.ListCreateAPIView):
 
     def get(self, request, *args, **kwargs):
         user = request.user
-        address_qs = Address.objects.filter(user=user).first()
+        address_qs = Address.objects.filter(user=user).last()
         if address_qs:
             serializer = AddressSerializers(address_qs)
             return response.Response(serializer.data)
@@ -35,11 +37,10 @@ class CreateAddressApiView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         user = request.user
         data = request.data
-        print(data)
+        print('get request for create address.....')
         serializer = AddressSerializers(data=data)
         if serializer.is_valid():
             serializer.save(user=user)
-            print(serializer.data)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response({"msg": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -56,10 +57,8 @@ class SaveLocalCoordsToDB(views.APIView):
         user = request.user
         if user.is_authenticated:
             data = request.data
-            print(data["lat"])
-            print(data["lng"])
 
-            address_qs = Address.objects.filter(user=user).first()
+            address_qs = Address.objects.filter(user=user).last()
             if address_qs:
                 if address_qs.lattitude == data["lat"] and address_qs.longtitude == data["lng"]:
                     return response.Response(status=status.HTTP_200_OK)
@@ -69,6 +68,8 @@ class SaveLocalCoordsToDB(views.APIView):
                     address_qs.save()
                     return response.Response(status=status.HTTP_200_OK)
             else:
+                print('get request for create address..... SaveLocalCoordsToDB')
+
                 Address.objects.create(
                     user=user,
                     lattitude=data["lat"],
@@ -76,5 +77,4 @@ class SaveLocalCoordsToDB(views.APIView):
                 )
                 return response.Response(status=status.HTTP_200_OK)
         else:
-            print('errrrrrrrrrrrrrrrrrr')
             return response.Response({"msg": "User Unauthorized"}, status=status.HTTP_400_BAD_REQUEST)
