@@ -136,9 +136,11 @@ class FetchProductsByCategory1(views.APIView):
 
 class GetProductsByBrands(views.APIView):
     def get(self, request, *args, **kwargs):
-        brand_name = request.query_params.get('brands_name')
+        brand_name = request.query_params['brand_name']
+        print('brands.............', brand_name)
 
         if brand_name is None:
+            print('brand_name', )
             return Response({"err": "brand_name is not provide"}, status=status.HTTP_400_BAD_REQUEST)
         product_qs = Products.objects.filter(
             supplier_name=brand_name

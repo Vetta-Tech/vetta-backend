@@ -152,7 +152,7 @@ STATIC_URL = '/static/'
 
 INTERNAL_IPS = [
     "127.0.0.1",
-    '192.168.0.204'
+    '192.168.1.110'
 ]
 
 CORS_ALLOW_CREDENTIALS = True

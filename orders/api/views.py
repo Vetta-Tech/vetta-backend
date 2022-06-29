@@ -70,7 +70,7 @@ class SslCommerzTest(views.APIView):
         post_body['tran_id'] = 'asd'
         post_body['success_url'] = 'https://www.youtube.com/'
         post_body['fail_url'] = 'https://m.facebook.com/'
-        post_body['cancel_url'] = 'http://192.168.0.204:8000/api/v1/orders/test'
+        post_body['cancel_url'] = 'http://192.168.1.110:8000/api/v1/orders/test'
         post_body['emi_option'] = 0
         post_body['cus_name'] = 'sohan'
         post_body['cus_email'] = 'email@rmail.com'
