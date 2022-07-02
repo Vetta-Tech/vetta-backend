@@ -11,7 +11,6 @@ from coupon.models import Coupon
 
 
 class UserCartListApiView(views.APIView):
-
     def get(self, request, *args, **kwargs):
         user = self.request.user
         if user.is_authenticated:
@@ -25,11 +24,13 @@ class UserCartListApiView(views.APIView):
                 return Response({
                     "cart_qs": serailizer.data,
                     "final_cart": final_qs_serializer.data,
+                    "lenght": len(final_qs.cart.all())
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({
-                    "msg": "No cart"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                    "msg": "No cart",
+                    "lenght": 0
+                }, status=status.HTTP_200_OK)
         else:
             return Response({
                 "msg": "No cart"
@@ -232,10 +233,11 @@ class MinusQuantity(views.APIView):
 class CouponAddedApi(views.APIView):
     def post(self, request, *args, **kwargs):
         coupon_code = request.data.get('coupon_code', None)
+        print('coupon qs', coupon_code)
+
         final_cart_id = request.data.get('final_cart_id', None)
         if coupon_code and final_cart_id is not None:
             coupon_qs = get_object_or_404(Coupon, code=coupon_code)
-            print(coupon_qs)
             final_cart_qs = get_object_or_404(FinalCart, id=final_cart_id)
 
             if final_cart_qs.coupon is None:
@@ -249,10 +251,12 @@ class CouponAddedApi(views.APIView):
                         "msg": "Coupone added successfully"
                     }, status=status.HTTP_200_OK)
             else:
+                print("Cannot add more than one coupon")
                 return Response({
                     "msg": "Cannot add more than one coupon"
                 }, status=status.HTTP_400_BAD_REQUEST)
         else:
+            print("Invalid Coupon")
             return Response({
                 "msg": "Invalid Coupon"
             }, status=status.HTTP_400_BAD_REQUEST)

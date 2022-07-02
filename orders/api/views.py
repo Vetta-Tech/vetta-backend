@@ -70,7 +70,7 @@ class SslCommerzTest(views.APIView):
         post_body['tran_id'] = 'asd'
         post_body['success_url'] = 'https://www.youtube.com/'
         post_body['fail_url'] = 'https://m.facebook.com/'
-        post_body['cancel_url'] = 'http://192.168.1.110:8000/api/v1/orders/test'
+        post_body['cancel_url'] = 'http://192.168.0.204:8000/api/v1/orders/test'
         post_body['emi_option'] = 0
         post_body['cus_name'] = 'sohan'
         post_body['cus_email'] = 'email@rmail.com'
@@ -102,9 +102,13 @@ class OrdercofirmApiView(views.APIView):
             q.save()
         final_cart_qs = FinalCart.objects.filter(
             user=request.user, expires=False).first()
+        print('final cart.............', final_cart_qs)
+
         if final_cart_qs:
             order_qs = Order.objects.filter(user=user, orordered=False).first()
             if order_qs:
+                print('responseeeeeeee...........2222222222')
+
                 print('order_qs', order_qs)
                 final_cart_qs.expires = True
                 final_cart_qs.save()
@@ -113,11 +117,15 @@ class OrdercofirmApiView(views.APIView):
                 order_qs.payment_method = payment_method
                 order_qs.save()
 
-                print(order_qs)
                 serializer = OrderSerializer(order_qs)
+                print('serializer', serializer.data)
+                print('responseeeeeeee...........')
+
                 return Response({'order_qs': serializer.data}, status=status.HTTP_200_OK)
+            print('errrrrrrrrrrror1')
             return Response({'msg': "No active order found"}, status=status.HTTP_400_BAD_REQUEST)
         else:
+            print('errrrrrrrrrrror2')
             return Response({'msg': "No active cart found"}, status=status.HTTP_400_BAD_REQUEST)
 
 

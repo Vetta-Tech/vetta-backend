@@ -18,7 +18,7 @@ from products.models import (
     Color,
     Size,
     Variants,
-
+    Supplier
 )
 
 
@@ -41,6 +41,14 @@ class ColorSerailizers(serializers.ModelSerializer):
 class SizeSerailizers(serializers.ModelSerializer):
     class Meta:
         model = Size
+        fields = (
+            '__all__'
+        )
+
+
+class SupplierSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Supplier
         fields = (
             '__all__'
         )
@@ -81,6 +89,7 @@ class ProductsSerailizers(serializers.ModelSerializer, TaggitSerializer):
     sub_category = SaubCategorySerailizers(many=False)
     variants = VariantsSerailizers(many=True, read_only=True)
     keywords = TagListSerializerField()
+    supplier = SupplierSerializer()
     images = ProductImagesSerailizers(many=True, read_only=True)
 
     class Meta:
@@ -89,6 +98,7 @@ class ProductsSerailizers(serializers.ModelSerializer, TaggitSerializer):
             'id',
             'supplier_name',
             'name',
+            'supplier',
             'slug',
             'category',
             'sub_category',

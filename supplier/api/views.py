@@ -1,7 +1,10 @@
 import re
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
+
 from products.models import Products
+
 
 from supplier.models import Supplier
 from products.api.serializers import ProductsSerailizers
@@ -23,17 +26,22 @@ def infinite_scroll_brands(request):
     limit = request.GET.get('limit')
     offset = request.GET.get('offset')
     cat = request.GET.get('cat')
-    supplier = request.GET.get('supplier')
+    supplier_slug = request.GET.get('supplier')
+
+    print(supplier_slug)
+
+    brand_qs = get_object_or_404(Supplier, slug=supplier_slug)
+    print('brands_qs', brand_qs)
 
     if cat == 'All Products':
         qs = Products.objects.filter(
-            supplier__name=supplier
+            supplier=brand_qs
         )
         print('All Products', qs)
         return qs[int(offset): int(offset) + int(limit)]
     else:
         qs = Products.objects.filter(
-            supplier__name=supplier,
+            supplier=brand_qs,
             category__name__icontains=cat
         )
         print('All Products-2', qs)
@@ -46,13 +54,11 @@ class SupplierProductsByCategory(generics.ListAPIView):
 
     def get_queryset(self):
         qs = infinite_scroll_brands(self.request)
-        print('All Products-2', qs)
-
         return qs
 
     def list(self, request, *args, **kwargs):
         qs = self.get_queryset()
-        print('products', qs)
+        print(qs)
         serializer = ProductsSerailizers(qs, many=True)
         return Response({
             "products": serializer.data

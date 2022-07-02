@@ -5,9 +5,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, views, status, permissions
 from rest_framework.response import Response
 
+from supplier.models import Supplier
+
 from .serializers import (
     CategoriesSerailizers,
-    ProductSerializerMinimal,
     SaubCategorySerailizers,
     VariantsSerailizers,
     ProductImagesSerailizers,
@@ -136,20 +137,20 @@ class FetchProductsByCategory1(views.APIView):
 
 class GetProductsByBrands(views.APIView):
     def get(self, request, *args, **kwargs):
-        brand_name = request.query_params['brand_name']
-        print('brands.............', brand_name)
+        # brand_slug = request.query_params['brand_slug']
+        brand_slug = 'Apple'
+        print('brands.............', brand_slug)
 
-        if brand_name is None:
-            print('brand_name', )
+        if brand_slug is None:
             return Response({"err": "brand_name is not provide"}, status=status.HTTP_400_BAD_REQUEST)
-        product_qs = Products.objects.filter(
-            supplier_name=brand_name
-        )
-
-        print('brand_name', product_qs)
-
-        serailizer = ProductsSerailizers(product_qs, many=True)
-        return Response({"products": serailizer.data}, status=status.HTTP_200_OK)
+        brand_qs = get_object_or_404(Supplier, slug=brand_slug)
+        if brand_qs:
+            product_qs = Products.objects.filter(
+                supplier=brand_qs
+            )
+            print('supplier_slug', product_qs)
+            serailizer = ProductsSerailizers(product_qs, many=True)
+            return Response({"products": serailizer.data}, status=status.HTTP_200_OK)
 
 
 class GetAllCategories(views.APIView):
